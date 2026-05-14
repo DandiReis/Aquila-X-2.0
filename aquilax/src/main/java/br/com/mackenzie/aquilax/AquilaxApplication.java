@@ -13,12 +13,4 @@ public class AquilaxApplication {
 		SpringApplication.run(AquilaxApplication.class, args);
 	}
 
-	@Bean
-	public CommandLineRunner demo(MissaoService service) {
-		return args -> {
-			System.out.println("\n--- INICIANDO TESTE DE SISTEMA MILITAR ---");
-			service.iniciarMissaoMilitar("Vigilância de Perímetro Mackenzie", 1, 1);
-			System.out.println("--- TESTE FINALIZADO COM SUCESSO ---\n");
-		};
-	}
 }
