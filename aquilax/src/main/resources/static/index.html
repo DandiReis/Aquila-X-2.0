@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÁQUILA X - Centro de Operações</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg-color: #0a0f12;
+            --panel-color: #11181e;
+            --accent-color: #00ff66;
+            --text-color: #e0e6ed;
+            --danger-color: #ff3333;
+            --disabled-color: #34495e;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+
+        /* Sistema de Abas/Navegação (SÓ APARECE APÓS LOGIN) */
+        nav {
+            display: none;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background-color: #1a242d;
+            border: 1px solid #233542;
+            color: var(--text-color);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            text-transform: uppercase;
+        }
+
+        .nav-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+        }
+
+        /* Telas */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* TELA DE LOGIN */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: var(--panel-color);
+            border: 1px solid #233542;
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .full-panel {
+            grid-column: 1 / -1;
+        }
+
+        h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            border-bottom: 1px solid #233542;
+            padding-bottom: 5px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #1a242d;
+            border: 1px solid #34495e;
+            color: var(--text-color);
+            font-family: inherit;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        /* GRID DE DRONES (FROTA) */
+        .drone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .drone-card {
+            background: #161f26;
+            border: 1px solid #2d4254;
+            border-radius: 4px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 3px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        .status-ready { background-color: rgba(0, 255, 102, 0.2); color: var(--accent-color); border: 1px solid var(--accent-color); }
+        .status-maint { background-color: rgba(255, 51, 51, 0.2); color: var(--danger-color); border: 1px solid var(--danger-color); }
+
+        /* TERMINAL E MAPA */
+        #terminalLog {
+            background-color: #050709;
+            border: 1px solid #1a242d;
+            height: 140px;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 4px;
+            color: #00ff66;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 8px;
+        }
+
+        #map {
+            height: 250px;
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            background-color: #1a242d;
+        }
+
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🦅 ÁQUILA X // HUB DE DEFESA</h1>
+        <div id="operatorBadge" style="display: none; color: var(--accent-color); font-weight: bold;"></div>
+    </header>
+
+    <nav id="mainNav">
+        <button class="nav-btn active" onclick="switchScreen('frotaScreen')">🛩️ Ver Frota</button>
+        <button class="nav-btn" onclick="switchScreen('missaoScreen')">⚡ Painel de Missões</button>
+    </nav>
+
+    <div id="loginScreen" class="screen active">
+        <div class="panel login-container">
+            <h2>🔑 AUTENTICAÇÃO MILITAR</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Identificação do Operador (User):</label>
+                    <input type="text" id="username" placeholder="Digite seu codinome..." required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Chave Criptográfica (Senha):</label>
+                    <input type="password" id="password" value="******" required>
+                </div>
+                <button type="submit">Acessar Sistema 🛡️</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="frotaScreen" class="screen">
+        <div class="panel full-panel">
+            <h2>🛸 FROTA ATIVA DE VEÍCULOS (MACKENZIE CONTROL)</h2>
+            <p>Sincronizado em tempo real com a tabela <code>drone</code> do banco MySQL.</p>
+            <div class="drone-grid" id="droneGrid">
+                <div class="log-entry">Carregando inventário de hardware tático...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="missaoScreen" class="screen">
+        <div class="container">
+            <div class="panel">
+                <h2>⚡ DISPARAR NOVA MISSÃO</h2>
+                <form id="missionForm">
+                    <div class="form-group">
+                        <label for="objetivo">Diretriz/Objetivo Operacional:</label>
+                        <textarea id="objetivo" rows="3" placeholder="Mínimo 5 caracteres..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="idOperador">ID do Operador Responsável:</label>
+                        <input type="number" id="idOperador" value="1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="idDrone">ID do Equipamento Alocado:</label>
+                        <input type="number" id="idDrone" placeholder="Ex: 1" required>
+                    </div>
+                    <button type="submit">Iniciar Decolagem Autorizada 🚀</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>🛰️ FEED DE TELEMETRIA E RASTREAMENTO</h2>
+                <div id="terminalLog">
+                    <div class="log-entry">[SISTEMA] Aguardando acionamento de propulsão...</div>
+                </div>
+                
+                <h3>🗺️ VETOR DE DESLOCAMENTO (LEAFLET RADAR)</h3>
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicialização global do Mapa
+        const map = L.map('map').setView([-23.546, -46.654], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        let droneMarker = null;
+
+        // Gerenciador de Troca de Telas (Abas)
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.getAttribute('onclick').includes(screenId));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // Recarrega o tamanho do mapa caso mude de aba (evita que o mapa renderize quebrado)
+            if (screenId === 'missaoScreen') {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        // LÓGICA DE LOGIN SIMULADO
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            
+            // Exibe barra de navegação e cabeçalho operacional
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainNav').style.display = 'flex';
+            
+            const badge = document.getElementById('operatorBadge');
+            badge.innerText = `👤 OPERADOR: ${user.toUpperCase()}`;
+            badge.style.display = 'block';
+
+            // Carrega os drones direto do banco de dados
+            carregarFrotaDrones();
+            switchScreen('frotaScreen');
+        });
+        </script>
+        <script>
+        // CONEXÃO COM O BACKEND: BUSCAR FROTA DO BANCO (MySQL)
+        async function carregarFrotaDrones() {
+            const grid = document.getElementById('droneGrid');
+            try {
+                // Rota padrão do Spring Boot para buscar a frota (se sua rota for diferente, ajuste aqui)
+                const response = await fetch('http://localhost:8080/api/drones'); 
+                
+                if (response.ok) {
+                    const drones = await response.getJson ? await response.getJson() : await response.json();
+                    grid.innerHTML = '';
+                    
+                    if(drones.length === 0) {
+                        grid.innerHTML = '<div class="log-entry">Nenhum drone cadastrado no MySQL.</div>';
+                        return;
+                    }
+
+                    drones.forEach(drone => {
+                        const isReady = drone.status === 1;
+                        grid.innerHTML += `
+                            <div class="drone-card">
+                                <span class="status-badge ${isReady ? 'status-ready' : 'status-maint'}">
+                                    ${isReady ? 'PRONTO' : 'MANUTENÇÃO'}
+                                </span>
+                                <h3 style="color: var(--accent-color); margin-top:0;">🛸 ID: ${drone.idDrone || drone.id}</h3>
+                                <p><strong>Modelo:</strong> ${drone.modelo || 'Áquila Scout'}</p>
+                                <p><strong>Autonomia:</strong> ${drone.autonomia || '45'} min</p>
+                                <p style="font-size:0.8rem; color:#7f8c8d;">Database Ref: MySQL Server</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    usarDronesMockados("Erro ao ler da API. Exibindo contingência local.");
+                }
+            } catch (error) {
+                usarDronesMockados("Servidor offline. Exibindo hardware simulado.");
+            }
+        }
+
+        function usarDronesMockados(mensagem) {
+            const grid = document.getElementById('droneGrid');
+            grid.innerHTML = `<div class="log-entry" style="color: #ffcc00; grid-column: 1/-1;">⚠️ ${mensagem}</div>`;
+            
+            // Drones de backup para o seu sistema não abrir vazio caso o banco esteja fechado
+            const mockDrones = [
+                { id: 1, modelo: "Áquila Predator-X", autonomia: 60, status: 1 },
+                { id: 2, modelo: "Áquila Reaper-V2", autonomia: 90, status: 1 },
+                { id: 3, modelo: "Spyder Micro-Scout", autonomia: 30, status: 0 }
+            ];
+
+            mockDrones.forEach(drone => {
+                grid.innerHTML += `
+                    <div class="drone-card">
+                        <span class="status-badge ${drone.status === 1 ? 'status-ready' : 'status-maint'}">
+                            ${drone.status === 1 ? 'PRONTO' : 'MANUTENÇÃO'}
+                        </span>
+                        <h3 style="color: var(--accent-color); margin-top:0;">🛸 ID: ${drone.id}</h3>
+                        <p><strong>Modelo:</strong> ${drone.modelo}</p>
+                        <p><strong>Autonomia:</strong> ${drone.autonomia} min</p>
+                        <p style="font-size:0.8rem; color:#7f8c8d;">Modo: Simulação Tática</p>
+                    </div>
+                `;
+            });
+        }
+
+        // DISPARO DE MISSÃO E STREAMING DE TELEMETRIA
+        document.getElementById('missionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const objetivo = document.getElementById('objetivo').value;
+            const idOperador = parseInt(document.getElementById('idOperador').value);
+            const idDrone = parseInt(document.getElementById('idDrone').value);
+            const terminal = document.getElementById('terminalLog');
+
+            terminal.innerHTML = `<div class="log-entry">[SISTEMA] Despachando coordenadas para o Core...</div>`;
+
+            try {
+                const response = await fetch('http://localhost:8080/api/missoes/iniciar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ objetivo, idOperador, idDrone })
+                });
+
+                if (response.ok) {
+                    terminal.innerHTML += `<div class="log-entry" style="color: #00ff66;">🟢 Status 200: Decolagem autorizada!</div>`;
+                    terminal.innerHTML += `<div class="log-entry">💾 MySQL -> Diretriz de missão gravada.</div>`;
+                    terminal.innerHTML += `<div class="log-entry">🍃 MongoDB -> Gravando telemetria no Atlas...</div>`;
+                    simularMovimentoNoMapa(terminal);
+                } else {
+                    const errorText = await response.text();
+                    terminal.innerHTML += `<div class="log-entry" style="color: var(--danger-color);">🔴 ABORTAR (500): Falha nos critérios de segurança.</div>`;
+                    terminal.innerHTML += `<div class="log-entry" style="color: var(--danger-color);">[MOTIVO]: ${errorText || 'Drone em manutenção ou ID inexistente.'}</div>`;
+                }
+            } catch (error) {
+                terminal.innerHTML += `<div class="log-entry" style="color: var(--danger-color);">❌ CRITICAL: Link com o endpoint rompido.</div>`;
+            }
+            terminal.scrollTop = terminal.scrollHeight;
+        });
+
+        function simularMovimentoNoMapa(terminal) {
+            let latBase = -23.5465; let lngBase = -46.6542; let etapa = 1;
+            if (droneMarker) map.removeLayer(droneMarker);
+
+            droneMarker = L.marker([latBase, lngBase]).addTo(map).bindPopup('<b>ÁQUILA X</b><br>Missão em andamento.').openPopup();
+            map.setView([latBase, lngBase], 15);
+
+            const intervaloVoo = setInterval(() => {
+                if (etapa > 5) {
+                    clearInterval(intervaloVoo);
+                    terminal.innerHTML += `<div class="log-entry" style="color: #00ff66;">🏁 [SISTEMA] Operação finalizada com sucesso.</div>`;
+                    terminal.scrollTop = terminal.scrollHeight;
+                    droneMarker.setPopupContent('<b>ÁQUILA X</b><br>Em solo seguro.').openPopup();
+                    return;
+                }
+                latBase += 0.0012; lngBase -= 0.0008;
+                droneMarker.setLatLng([latBase, lngBase]);
+                map.panTo([latBase, lngBase]);
+
+                terminal.innerHTML += `<div class="log-entry">📍 Telemetria #${etapa} -> Lat: ${latBase.toFixed(4)} | Lng: ${lngBase.toFixed(4)} [Sincronizado Atlas]</div>`;
+                terminal.scrollTop = terminal.scrollHeight;
+                etapa++;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@ package br.com.mackenzie.aquilax.model; // 1. O pacote deve ser a primeira linha
 
 import jakarta.persistence.*; // 2. Isso resolve todos os erros de @Entity, @Table, @Id, etc.
 import java.time.LocalDateTime; // 3. Isso resolve o erro do LocalDateTime
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "missao")
@@ -32,7 +33,7 @@ public class Missao {
         this.objetivo = objetivo;
         this.idOperador = idOperador;
         this.idDrone = idDrone;
-        this.dataInicio = LocalDateTime.now();
+        this.dataInicio = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
     }
 
     // 3. GETTERS E SETTERS (O Spring usa o GET para mostrar no navegador!)
