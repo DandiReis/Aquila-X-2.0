@@ -3,278 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ÁQUILA X - Centro de Operações</title>
+    <title>ÁQUILA X - Centro de Operações Táticas</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
-            --bg-color: #0a0f12;
-            --panel-color: #11181e;
-            --accent-color: #00ff66;
-            --text-color: #e0e6ed;
-            --danger-color: #ff3333;
-            --disabled-color: #34495e;
+            --bg-color: #0b1116;
+            --panel-color: #121a21;
+            --accent-color: #38ef7d; 
+            --text-color: #cbd5e1;
+            --text-bright: #ffffff;
+            --border-color: #243442;
+            --danger-color: #ff4d4d;
+            --warning-color: #ffaa00;
+            --disabled-color: #52667a;
+            --blue-tactical: #1c2d3d;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 20px;
         }
 
         header {
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        header h1 { margin: 0; font-size: 1.8rem; }
+        header h1 { 
+            margin: 0; 
+            font-size: 1.5rem; 
+            font-weight: 600;
+            color: var(--text-bright);
+            letter-spacing: 0.5px;
+        }
 
-        /* Sistema de Abas/Navegação (SÓ APARECE APÓS LOGIN) */
         nav {
             display: none;
-            margin-bottom: 20px;
-            gap: 10px;
+            margin-bottom: 25px;
+            gap: 5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
         }
 
         .nav-btn {
-            background-color: #1a242d;
-            border: 1px solid #233542;
-            color: var(--text-color);
+            background: transparent;
+            border: none;
+            color: var(--disabled-color);
             padding: 10px 20px;
             cursor: pointer;
-            font-weight: bold;
-            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
             text-transform: uppercase;
+            transition: all 0.2s ease;
         }
 
-        .nav-btn.active {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-            box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
-        }
+        .nav-btn:hover { color: var(--text-color); }
+        .nav-btn.active { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); }
 
-        /* Telas */
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* TELA DE LOGIN */
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        .login-container { max-width: 400px; margin: 100px auto; }
 
         .panel {
             background-color: var(--panel-color);
-            border: 1px solid #233542;
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        .full-panel {
-            grid-column: 1 / -1;
-        }
+        .full-panel { width: 100%; box-sizing: border-box; }
 
         h2 {
-            color: var(--accent-color);
+            color: var(--text-bright);
+            font-size: 1.1rem;
             margin-top: 0;
-            border-bottom: 1px solid #233542;
-            padding-bottom: 5px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .form-group { margin-bottom: 15px; }
-
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; font-size: 0.8rem; font-weight: 600; color: #8fa0b5; }
 
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            background-color: #1a242d;
-            border: 1px solid #34495e;
-            color: var(--text-color);
+            padding: 10px 12px;
+            background-color: #18222b;
+            border: 1px solid var(--border-color);
+            color: var(--text-bright);
             font-family: inherit;
+            font-size: 0.9rem;
             border-radius: 4px;
             box-sizing: border-box;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
 
-        button {
+        button.btn-action {
             width: 100%;
             padding: 12px;
-            background-color: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
+            background-color: var(--blue-tactical);
+            border: 1px solid var(--border-color);
+            color: var(--text-bright);
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 4px;
+            transition: all 0.2s ease;
             text-transform: uppercase;
-            font-family: inherit;
+            font-size: 0.85rem;
         }
 
-        button:hover {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-            box-shadow: 0 0 15px var(--accent-color);
+        button.btn-action:hover:not(:disabled) {
+            border-color: var(--accent-color);
+            background-color: rgba(56, 239, 125, 0.04);
+            color: var(--accent-color);
         }
 
-        /* GRID DE DRONES (FROTA) */
-        .drone-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 15px;
+        button.btn-action:disabled { color: var(--disabled-color); cursor: not-allowed; background-color: #141b22; border-color: #1d2830; }
+
+        .frotas-wrapper { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 15px; align-items: flex-start; }
+
+        .frota-coluna {
+            flex: 1;
+            min-width: 310px;
+            background-color: var(--panel-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
         }
 
-        .drone-card {
-            background: #161f26;
-            border: 1px solid #2d4254;
-            border-radius: 4px;
-            padding: 15px;
-            position: relative;
-        }
+        .frota-header { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: var(--accent-color); font-size: 0.95rem; text-transform: uppercase; }
 
-        .status-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 3px 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            border-radius: 3px;
-        }
+        .drone-item-row { background-color: #18222b; border: 1px solid var(--border-color); border-radius: 4px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .drone-info h4 { margin: 0; color: var(--text-bright); font-size: 0.85rem; font-weight: 500; }
+        .drone-info p { margin: 3px 0 0 0; font-size: 0.75rem; color: #8fa0b5; }
 
-        .status-ready { background-color: rgba(0, 255, 102, 0.2); color: var(--accent-color); border: 1px solid var(--accent-color); }
-        .status-maint { background-color: rgba(255, 51, 51, 0.2); color: var(--danger-color); border: 1px solid var(--danger-color); }
+        .drone-counter { background-color: var(--blue-tactical); padding: 4px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: bold; color: var(--accent-color); border: 1px solid rgba(56, 239, 125, 0.15); }
 
-        /* TERMINAL E MAPA */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        th { padding: 12px 10px; text-align: left; color: #8fa0b5; border-bottom: 2px solid var(--border-color); text-transform: uppercase; font-size: 0.75rem; }
+        td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-color); }
+
+        .grid-missoes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
         #terminalLog {
-            background-color: #050709;
-            border: 1px solid #1a242d;
-            height: 140px;
+            background-color: #080d12;
+            border: 1px solid var(--border-color);
+            height: 160px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 12px;
             border-radius: 4px;
-            color: #00ff66;
-            font-size: 0.9rem;
+            color: #a3b8cc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
             margin-bottom: 15px;
         }
 
-        .log-entry {
-            margin-bottom: 5px;
-            border-left: 3px solid var(--accent-color);
-            padding-left: 8px;
-        }
+        .log-entry { margin-bottom: 5px; border-left: 3px solid #52667a; padding-left: 8px; }
+        .log-success { border-color: var(--accent-color); color: var(--accent-color); }
+        .log-warn { border-color: var(--warning-color); color: var(--warning-color); }
+        .log-danger { border-color: var(--danger-color); color: var(--danger-color); }
 
-        #map {
-            height: 250px;
-            border: 1px solid var(--accent-color);
-            border-radius: 4px;
-            background-color: #1a242d;
-        }
-
-        .leaflet-layer,
-        .leaflet-control-zoom-in,
-        .leaflet-control-zoom-out {
-            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-        }
+        #map { height: 320px; border: 1px solid var(--border-color); border-radius: 4px; background-color: #0b1116; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🦅 ÁQUILA X // HUB DE DEFESA</h1>
-        <div id="operatorBadge" style="display: none; color: var(--accent-color); font-weight: bold;"></div>
+        <h1>AQUILA X</h1>
+        <h2>HUB OPERACIONAL</h2>
+        <div id="operatorBadge" style="display: none; color: var(--accent-color); font-weight: bold; font-size: 0.9rem;"></div>
     </header>
 
     <nav id="mainNav">
-        <button class="nav-btn active" onclick="switchScreen('frotaScreen')">🛩️ Ver Frota</button>
-        <button class="nav-btn" onclick="switchScreen('missaoScreen')">⚡ Painel de Missões</button>
+        <button class="nav-btn active" onclick="switchScreen('frotaScreen')">Hangar de Frotas</button>
+        <button class="nav-btn" onclick="switchScreen('missaoScreen')">Painel de Missões</button>
     </nav>
 
     <div id="loginScreen" class="screen active">
         <div class="panel login-container">
-            <h2>🔑 AUTENTICAÇÃO MILITAR</h2>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Identificação do Operador (User):</label>
-                    <input type="text" id="username" placeholder="Digite seu codinome..." required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Chave Criptográfica (Senha):</label>
-                    <input type="password" id="password" value="******" required>
-                </div>
-                <button type="submit">Acessar Sistema 🛡️</button>
-            </form>
+            <div id="loginCredentialsGroup">
+                <h2>Autenticação</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Operador:</label>
+                        <input type="text" id="username" placeholder="Digite seu registro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Senha:</label>
+                        <input type="password" id="password" placeholder="Digite sua senha" required>
+                    </div>
+                    <button type="submit" class="btn-action">Verificar Credenciais</button>
+                </form>
+            </div>
+
+            <div id="loginMfaGroup" style="display: none;">
+                <h2>TOKEN</h2>
+                <p style="font-size: 0.8rem; color: #8fa0b5; margin-bottom: 15px;">
+                    Insira o Token de Segurança de 6 dígitos gerado no seu dispositivo tático autorizado.
+                </p>
+                <form id="mfaForm">
+                    <div class="form-group">
+                        <label for="mfaToken">Token de Autenticação (TOTP):</label>
+                        <input type="text" id="mfaToken" maxlength="6" placeholder="000000" style="text-align: center; font-size: 1.4rem; letter-spacing: 5px; font-weight: bold;" required>
+                    </div>
+                    <button type="submit" class="btn-action">Liberar Acesso ao Hangar</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <div id="frotaScreen" class="screen">
-        <div class="panel full-panel">
-            <h2>🛸 FROTA ATIVA DE VEÍCULOS (MACKENZIE CONTROL)</h2>
-            <p>Sincronizado em tempo real com a tabela <code>drone</code> do banco MySQL.</p>
-            <div class="drone-grid" id="droneGrid">
-                <div class="log-entry">Carregando inventário de hardware tático...</div>
-            </div>
+        <h2>Esquadrões Disponíveis</h2>
+        <div class="frotas-wrapper" id="frotasContainer">
+            <div class="log-entry">Sincronizando frotas táticas...</div>
         </div>
     </div>
 
     <div id="missaoScreen" class="screen">
-        <div class="container">
+        <div class="grid-missoes">
             <div class="panel">
-                <h2>⚡ DISPARAR NOVA MISSÃO</h2>
+                <h2>Diretrizes e Vetor de Deslocamento</h2>
+                <div id="droneSelectedBadge" style="color: var(--danger-color); margin-bottom: 18px; font-size: 0.85rem; font-weight: bold;">
+                    NENHUM DRONE ALOCADO. SELECIONE UM NO HANGAR DE FROTAS.
+                </div>
                 <form id="missionForm">
+                    <input type="hidden" id="idOperador" value="">
+                    <input type="hidden" id="idDrone" value="">
+
                     <div class="form-group">
-                        <label for="objetivo">Diretriz/Objetivo Operacional:</label>
-                        <textarea id="objetivo" rows="3" placeholder="Mínimo 5 caracteres..." required></textarea>
+                        <label>Vetor de Navegação Dinâmico:</label>
+                        <button type="button" id="btnDefinirRota" class="btn-action" style="background-color: #192533; color: var(--text-bright); border-color: var(--border-color); margin-bottom: 10px;" onclick="alternarModoRota()">
+                            Inserir Rota no Mapa
+                        </button>
+                        <p style="font-size: 0.75rem; color: #8fa0b5; margin: 0;">
+                            Clique no botão acima e depois clique em múltiplos pontos sequenciais do mapa para traçar rotas personalizadas fluidas.
+                        </p>
                     </div>
+
                     <div class="form-group">
-                        <label for="idOperador">ID do Operador Responsável:</label>
-                        <input type="number" id="idOperador" value="1" readonly>
+                        <label for="objetivo">Objetivo Operacional:</label>
+                        <textarea id="objetivo" rows="3" placeholder="Descreva as diretrizes táticas..." required></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="idDrone">ID do Equipamento Alocado:</label>
-                        <input type="number" id="idDrone" placeholder="Ex: 1" required>
-                    </div>
-                    <button type="submit">Iniciar Decolagem Autorizada 🚀</button>
+                    <button type="submit" id="btnDecolar" class="btn-action" disabled>Disparar Comando de Decolagem</button>
                 </form>
             </div>
 
             <div class="panel">
-                <h2>🛰️ FEED DE TELEMETRIA E RASTREAMENTO</h2>
+                <h2>Telemetria e Central de Radar</h2>
                 <div id="terminalLog">
-                    <div class="log-entry">[SISTEMA] Aguardando acionamento de propulsão...</div>
+                    <div class="log-entry">[SISTEMA] Central de Monitoramento baseada na Mackenzie iniciada.</div>
                 </div>
-                
-                <h3>🗺️ VETOR DE DESLOCAMENTO (LEAFLET RADAR)</h3>
                 <div id="map"></div>
             </div>
+
+            <div class="panel full-panel" style="grid-column: 1 / -1; margin-top: 10px;">
+                <h2>Histórico de Operações Recentes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Objetivo Operacional</th>
+                            <th>Aeronave</th>
+                            <th>Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historicoMissoesBody">
+                        <tr>
+                            <td colspan="4" style="color: var(--disabled-color); text-align: center; padding: 15px;">Aguardando carga...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="authenticatorAppSimulator" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 220px; background-color: #16222f; border: 2px solid var(--accent-color); border-radius: 6px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 9999;">
+        <div style="font-size: 0.75rem; font-weight: bold; color: var(--accent-color); text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px;">
+            DISPOSITIVO OPERACIONAL
+        </div>
+        <div style="font-size: 0.7rem; color: #8fa0b5;">Aquila Authenticator</div>
+        <div id="simulatedTokenDisplay" style="font-size: 1.8rem; font-weight: bold; color: #ffffff; margin: 10px 0; letter-spacing: 2px; text-align: center;">------</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+            <span style="color: #8fa0b5;">Expira em:</span>
+            <span id="mfaTimerDisplay" style="font-weight: bold; color: var(--warning-color);">30s</span>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicialização global do Mapa
-        const map = L.map('map').setView([-23.546, -46.654], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        const map = L.map('map', { zoomControl: false }).setView([-23.5467, -46.6526], 14);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20,
+            attribution: '© OpenStreetMap & CARTO'
+        }).addTo(map);
+        
         let droneMarker = null;
+        let rotaVetor = null;
+        let currentActiveToken = "";
+        let mfaCountdownInterval = null;
 
-        // Gerenciador de Troca de Telas (Abas)
+        let pontosRotaCustomizada = [];
+        let modoDefinirRota = false;
+        let marcadoresClique = [];
+
+        const coordenadasSetores = {
+            hangarBase: [-23.5467, -46.6526]
+        };
+
+        const droneIcon = L.divIcon({
+            html: `
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: drop-shadow(0px 0px 4px #38ef7d);">
+                    <path d="M12 2L9 7H15L12 2Z" fill="#38ef7d"/>
+                    <path d="M4 12C4 10.9 4.9 10 6 10H18C19.1 10 20 10.9 20 12C20 13.1 19.1 14 18 14H6C4.9 14 4 13.1 4 12Z" fill="#38ef7d"/>
+                    <circle cx="6" cy="12" r="2" fill="#0b1116"/>
+                    <circle cx="18" cy="12" r="2" fill="#0b1116"/>
+                    <path d="M12 14V20M12 20H9M12 20H15" stroke="#38ef7d" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            `,
+            className: 'custom-drone-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -283,96 +344,251 @@
             const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.getAttribute('onclick').includes(screenId));
             if (activeBtn) activeBtn.classList.add('active');
 
-            // Recarrega o tamanho do mapa caso mude de aba (evita que o mapa renderize quebrado)
             if (screenId === 'missaoScreen') {
-                setTimeout(() => map.invalidateSize(), 100);
+                setTimeout(() => map.invalidateSize(), 150);
             }
         }
 
-        // LÓGICA DE LOGIN SIMULADO
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('username').value;
+        function startMfaAppSimulator() {
+            document.getElementById('authenticatorAppSimulator').style.display = 'block';
             
-            // Exibe barra de navegação e cabeçalho operacional
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainNav').style.display = 'flex';
-            
-            const badge = document.getElementById('operatorBadge');
-            badge.innerText = `👤 OPERADOR: ${user.toUpperCase()}`;
-            badge.style.display = 'block';
-
-            // Carrega os drones direto do banco de dados
-            carregarFrotaDrones();
-            switchScreen('frotaScreen');
-        });
-        </script>
-        <script>
-        // CONEXÃO COM O BACKEND: BUSCAR FROTA DO BANCO (MySQL)
-        async function carregarFrotaDrones() {
-            const grid = document.getElementById('droneGrid');
-            try {
-                // Rota padrão do Spring Boot para buscar a frota (se sua rota for diferente, ajuste aqui)
-                const response = await fetch('http://localhost:8080/api/drones'); 
+            function generateNewToken() {
+                currentActiveToken = String(Math.floor(100000 + Math.random() * 900000));
+                document.getElementById('simulatedTokenDisplay').innerText = currentActiveToken;
                 
-                if (response.ok) {
-                    const drones = await response.getJson ? await response.getJson() : await response.json();
-                    grid.innerHTML = '';
+                let timeLeft = 30;
+                document.getElementById('mfaTimerDisplay').innerText = `${timeLeft}s`;
+                document.getElementById('mfaTimerDisplay').style.color = "var(--accent-color)";
+
+                if (mfaCountdownInterval) clearInterval(mfaCountdownInterval);
+
+                mfaCountdownInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('mfaTimerDisplay').innerText = `${timeLeft}s`;
                     
-                    if(drones.length === 0) {
-                        grid.innerHTML = '<div class="log-entry">Nenhum drone cadastrado no MySQL.</div>';
-                        return;
+                    if (timeLeft <= 7) {
+                        document.getElementById('mfaTimerDisplay').style.color = "var(--danger-color)"; 
+                    } else if (timeLeft <= 15) {
+                        document.getElementById('mfaTimerDisplay').style.color = "var(--warning-color)";
                     }
 
-                    drones.forEach(drone => {
-                        const isReady = drone.status === 1;
-                        grid.innerHTML += `
-                            <div class="drone-card">
-                                <span class="status-badge ${isReady ? 'status-ready' : 'status-maint'}">
-                                    ${isReady ? 'PRONTO' : 'MANUTENÇÃO'}
-                                </span>
-                                <h3 style="color: var(--accent-color); margin-top:0;">🛸 ID: ${drone.idDrone || drone.id}</h3>
-                                <p><strong>Modelo:</strong> ${drone.modelo || 'Áquila Scout'}</p>
-                                <p><strong>Autonomia:</strong> ${drone.autonomia || '45'} min</p>
-                                <p style="font-size:0.8rem; color:#7f8c8d;">Database Ref: MySQL Server</p>
-                            </div>
-                        `;
-                    });
+                    if (timeLeft <= 0) {
+                        clearInterval(mfaCountdownInterval);
+                        generateNewToken(); 
+                    }
+                }, 1000);
+            }
+            generateNewToken();
+        }
+
+        // LOGIN
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ registroOperador: user, senha: pass })
+                });
+
+                if (response.ok) {
+                    document.getElementById('loginCredentialsGroup').style.display = 'none';
+                    document.getElementById('loginMfaGroup').style.display = 'block';
+                    startMfaAppSimulator();
                 } else {
-                    usarDronesMockados("Erro ao ler da API. Exibindo contingência local.");
+                    alert("ACESSO NEGADO: Credenciais inválidas.");
                 }
             } catch (error) {
-                usarDronesMockados("Servidor offline. Exibindo hardware simulado.");
+                alert("ERRO CRÍTICO: Servidor offline.");
+            }
+        });
+
+        // VALIDAR CODE MFA
+        document.getElementById('mfaForm').addEventListener('submit', async (e) => { // Adicionado o async aqui
+            e.preventDefault();
+            const inputToken = document.getElementById('mfaToken').value.trim();
+
+            if (inputToken === currentActiveToken) {
+                clearInterval(mfaCountdownInterval);
+                document.getElementById('authenticatorAppSimulator').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainNav').style.display = 'flex';
+                
+                const user = document.getElementById('username').value.trim();
+                document.getElementById('operatorBadge').innerText = `👤 OPERADOR: ${user.toUpperCase()}`;
+                document.getElementById('operatorBadge').style.display = 'block';
+                document.getElementById('idOperador').value = 1; 
+
+                // NOVO: Dispara a auditoria real para o MongoDB Atlas via Spring Boot
+                try {
+                    await fetch('http://localhost:8080/api/auth/log-acesso', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ registroOperador: user })
+                    });
+                } catch (err) {
+                    console.error("Falha ao sincronizar log de auditoria:", err);
+                }
+
+                carregarFrotaDrones();
+                carregarHistoricoMissoes();
+                switchScreen('frotaScreen');
+            } else {
+                alert("🚨 TOKEN REJEITADO: Código MFA inválido ou já expirado!");
+                document.getElementById('mfaToken').value = '';
+                document.getElementById('mfaToken').focus();
+            }
+        });
+
+        function alternarModoRota() {
+            modoDefinirRota = !modoDefinirRota;
+            const btn = document.getElementById('btnDefinirRota');
+            const terminal = document.getElementById('terminalLog');
+            
+            if (modoDefinirRota) {
+                pontosRotaCustomizada = [coordenadasSetores.hangarBase]; 
+                limparMarcadoresClique();
+                if (rotaVetor) map.removeLayer(rotaVetor);
+                if (droneMarker) map.removeLayer(droneMarker);
+                
+                btn.innerText = "Salvar Trajeto Planejado";
+                btn.style.borderColor = "var(--warning-color)";
+                btn.style.color = "var(--warning-color)";
+                terminal.innerHTML = `<div class="log-entry log-warn">[RADAR] Hangar Mackenzie Liberado. Desenhe a rota clicando sequencialmente no mapa.</div>`;
+            } else {
+                btn.innerText = "Inserir Rota no Mapa";
+                btn.style.borderColor = "var(--border-color)";
+                btn.style.color = "var(--text-bright)";
+                
+                if (pontosRotaCustomizada.length > 1) {
+                    rotaVetor = L.polyline(pontosRotaCustomizada, { color: '#38ef7d', weight: 3, dashArray: '5, 10' }).addTo(map);
+                    terminal.innerHTML += `<div class="log-entry log-success">✓ Vetor homologado saindo do Mackenzie com ${pontosRotaCustomizada.length - 1} checkpoints.</div>`;
+                } else {
+                    terminal.innerHTML += `<div class="log-entry log-danger">⚠️ Nenhuma rota customizada foi desenhada.</div>`;
+                }
             }
         }
 
-        function usarDronesMockados(mensagem) {
-            const grid = document.getElementById('droneGrid');
-            grid.innerHTML = `<div class="log-entry" style="color: #ffcc00; grid-column: 1/-1;">⚠️ ${mensagem}</div>`;
-            
-            // Drones de backup para o seu sistema não abrir vazio caso o banco esteja fechado
-            const mockDrones = [
-                { id: 1, modelo: "Áquila Predator-X", autonomia: 60, status: 1 },
-                { id: 2, modelo: "Áquila Reaper-V2", autonomia: 90, status: 1 },
-                { id: 3, modelo: "Spyder Micro-Scout", autonomia: 30, status: 0 }
-            ];
+        map.on('click', function(e) {
+            if (!modoDefinirRota) return;
+            const latLng = [e.latlng.lat, e.latlng.lng];
+            pontosRotaCustomizada.push(latLng);
+            const m = L.circleMarker(latLng, { radius: 4, color: '#38ef7d', fillColor: '#38ef7d' }).addTo(map);
+            marcadoresClique.push(m);
+            if (rotaVetor) map.removeLayer(rotaVetor);
+            rotaVetor = L.polyline(pontosRotaCustomizada, { color: 'rgba(56, 239, 125, 0.5)', weight: 2 }).addTo(map);
+        });
 
-            mockDrones.forEach(drone => {
-                grid.innerHTML += `
-                    <div class="drone-card">
-                        <span class="status-badge ${drone.status === 1 ? 'status-ready' : 'status-maint'}">
-                            ${drone.status === 1 ? 'PRONTO' : 'MANUTENÇÃO'}
-                        </span>
-                        <h3 style="color: var(--accent-color); margin-top:0;">🛸 ID: ${drone.id}</h3>
-                        <p><strong>Modelo:</strong> ${drone.modelo}</p>
-                        <p><strong>Autonomia:</strong> ${drone.autonomia} min</p>
-                        <p style="font-size:0.8rem; color:#7f8c8d;">Modo: Simulação Tática</p>
-                    </div>
-                `;
-            });
+        function limparMarcadoresClique() {
+            marcadoresClique.forEach(m => map.removeLayer(m));
+            marcadoresClique = [];
         }
 
-        // DISPARO DE MISSÃO E STREAMING DE TELEMETRIA
+        async function carregarFrotaDrones() {
+            const container = document.getElementById('frotasContainer');
+            try {
+                const response = await fetch('http://localhost:8080/api/missoes/frota-disponivel'); 
+                if (response.ok) {
+                    const drones = await response.json();
+                    renderizarFrotasLadoALado(drones);
+                } else {
+                    container.innerHTML = `<div class="log-entry" style="color: var(--danger-color)">Erro na leitura dos dados da API.</div>`;
+                }
+            } catch (error) {
+                const mockDrones = [
+                    { id: 1, modelo: "Predator-X", autonomia: 60, status: 1, nomeEsquadrao: "Esquadrão Jolly Rogers" },
+                    { id: 4, modelo: "Reaper-V2", autonomia: 90, status: 1, nomeEsquadrao: "Esquadrão Jolly Rogers" },
+                    { id: 5, modelo: "Mavic", autonomia: 120, status: 1, nomeEsquadrao: "Esquadrão Black Knights" }
+                ];
+                renderizarFrotasLadoALado(mockDrones);
+            }
+        }
+
+        function renderizarFrotasLadoALado(drones) {
+            const container = document.getElementById('frotasContainer');
+            container.innerHTML = '';
+            const frotas = {};
+
+            drones.forEach(drone => {
+                let nomeEsquadrao = "ESQUADRÃO INDEPENDENTE";
+                if (drone.frota && drone.frota.nomeEsquadrao) nomeEsquadrao = drone.frota.nomeEsquadrao;
+                else if (drone.nomeEsquadrao) nomeEsquadrao = drone.nomeEsquadrao;
+
+                if (!frotas[nomeEsquadrao]) frotas[nomeEsquadrao] = {};
+                const modelo = drone.modelo || "Áquila";
+                if (!frotas[nomeEsquadrao][modelo]) {
+                    frotas[nomeEsquadrao][modelo] = { dados: drone, quantidade: 0 };
+                }
+                frotas[nomeEsquadrao][modelo].quantidade++;
+            });
+
+            for (const [nomeEsquadrao, modelosObjeto] of Object.entries(frotas)) {
+                const coluna = document.createElement('div');
+                coluna.className = 'frota-coluna';
+                coluna.innerHTML = `<div class="frota-header">📁 ${nomeEsquadrao}</div>`;
+
+                for (const [modelo, info] of Object.entries(modelosObjeto)) {
+                    const idReal = info.dados.idDrone || info.dados.id;
+                    const itemRow = document.createElement('div');
+                    itemRow.className = 'drone-item-row';
+                    itemRow.innerHTML = `
+                        <div class="drone-info">
+                            <h4>${modelo}</h4>
+                            <p>Autonomia: ${info.dados.autonomia || 45} min</p>
+                        </div>
+                        <div style="display:flex; gap: 10px; align-items:center;">
+                            <span class="drone-counter">${info.quantidade} Qtd</span>
+                            <button class="btn-action" style="padding: 6px 10px; font-size: 0.75rem;" 
+                                onclick="alocarDrone(${idReal}, '${modelo}', '${nomeEsquadrao}')">
+                                Alocar
+                            </button>
+                        </div>
+                    `;
+                    coluna.appendChild(itemRow);
+                }
+                container.appendChild(coluna);
+            }
+        }
+
+        function alocarDrone(id, modelo, esquadrao) {
+            document.getElementById('idDrone').value = id;
+            const badge = document.getElementById('droneSelectedBadge');
+            badge.style.color = "var(--accent-color)";
+            badge.innerHTML = `🟢 OPERAÇÃO PRONTA: ${modelo.toUpperCase()} [${esquadrao.toUpperCase()}]`;
+            document.getElementById('btnDecolar').removeAttribute('disabled');
+            switchScreen('missaoScreen');
+        }
+
+        async function carregarHistoricoMissoes() {
+            const tbody = document.getElementById('historicoMissoesBody');
+            try {
+                const response = await fetch('http://localhost:8080/api/missoes/listar'); 
+                if (response.ok) {
+                    const missoes = await response.json();
+                    tbody.innerHTML = '';
+                    if (missoes.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px;">Nenhuma operação cadastrada.</td></tr>`;
+                        return;
+                    }
+                    missoes.forEach(m => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-weight: bold; color: var(--accent-color);">${m.idMissao || m.id}</td>
+                                <td>${m.objetivo}</td>
+                                <td>Aeronave #${m.idDrone || 1}</td>
+                                <td>Operador #${m.idOperador || 1}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger-color);">Link de logs offline.</td></tr>`;
+            }
+        }
+
         document.getElementById('missionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const objetivo = document.getElementById('objetivo').value;
@@ -380,7 +596,12 @@
             const idDrone = parseInt(document.getElementById('idDrone').value);
             const terminal = document.getElementById('terminalLog');
 
-            terminal.innerHTML = `<div class="log-entry">[SISTEMA] Despachando coordenadas para o Core...</div>`;
+            if(pontosRotaCustomizada.length <= 1) { 
+                alert("Por favor, desenhe uma rota válida clicando no mapa antes de decolar."); 
+                return; 
+            }
+
+            terminal.innerHTML = `<div class="log-entry">[SISTEMA] Sincronizando dados com o MySQL...</div>`;
 
             try {
                 const response = await fetch('http://localhost:8080/api/missoes/iniciar', {
@@ -390,44 +611,82 @@
                 });
 
                 if (response.ok) {
-                    terminal.innerHTML += `<div class="log-entry" style="color: #00ff66;">🟢 Status 200: Decolagem autorizada!</div>`;
-                    terminal.innerHTML += `<div class="log-entry">💾 MySQL -> Diretriz de missão gravada.</div>`;
-                    terminal.innerHTML += `<div class="log-entry">🍃 MongoDB -> Gravando telemetria no Atlas...</div>`;
-                    simularMovimentoNoMapa(terminal);
+                    terminal.innerHTML += `<div class="log-entry log-success">🛫 Vetor Autorizado. Unidade decolando da base Mackenzie...</div>`;
+                    carregarHistoricoMissoes();
+                    limparMarcadoresClique();
+                    gerenciarCicloDeVooDinamico(terminal);
                 } else {
-                    const errorText = await response.text();
-                    terminal.innerHTML += `<div class="log-entry" style="color: var(--danger-color);">🔴 ABORTAR (500): Falha nos critérios de segurança.</div>`;
-                    terminal.innerHTML += `<div class="log-entry" style="color: var(--danger-color);">[MOTIVO]: ${errorText || 'Drone em manutenção ou ID inexistente.'}</div>`;
+                    terminal.innerHTML += `<div class="log-entry log-danger">🔴 Comando rejeitado pela central.</div>`;
                 }
             } catch (error) {
-                terminal.innerHTML += `<div class="log-entry" style="color: var(--danger-color);">❌ CRITICAL: Link com o endpoint rompido.</div>`;
+                terminal.innerHTML += `<div class="log-entry log-danger">Erro crítico: Falha de link.</div>`;
             }
-            terminal.scrollTop = terminal.scrollHeight;
         });
 
-        function simularMovimentoNoMapa(terminal) {
-            let latBase = -23.5465; let lngBase = -46.6542; let etapa = 1;
+        function gerenciarCicloDeVooDinamico(terminal) {
             if (droneMarker) map.removeLayer(droneMarker);
+            droneMarker = L.marker(coordenadasSetores.hangarBase, { icon: droneIcon }).addTo(map);
+            
+            let indicePonto = 0;
+            let bateria = 100;
 
-            droneMarker = L.marker([latBase, lngBase]).addTo(map).bindPopup('<b>ÁQUILA X</b><br>Missão em andamento.').openPopup();
-            map.setView([latBase, lngBase], 15);
-
-            const intervaloVoo = setInterval(() => {
-                if (etapa > 5) {
-                    clearInterval(intervaloVoo);
-                    terminal.innerHTML += `<div class="log-entry" style="color: #00ff66;">🏁 [SISTEMA] Operação finalizada com sucesso.</div>`;
-                    terminal.scrollTop = terminal.scrollHeight;
-                    droneMarker.setPopupContent('<b>ÁQUILA X</b><br>Em solo seguro.').openPopup();
+            function moverParaProximoCheckpoint() {
+                if (indicePonto >= pontosRotaCustomizada.length - 1) {
+                    terminal.innerHTML += `<div class="log-entry log-success">🏁 Objetivo alcançado. Retornando em modo autônomo para o Mackenzie.</div>`;
+                    executarRetornoBase();
                     return;
                 }
-                latBase += 0.0012; lngBase -= 0.0008;
-                droneMarker.setLatLng([latBase, lngBase]);
-                map.panTo([latBase, lngBase]);
 
-                terminal.innerHTML += `<div class="log-entry">📍 Telemetria #${etapa} -> Lat: ${latBase.toFixed(4)} | Lng: ${lngBase.toFixed(4)} [Sincronizado Atlas]</div>`;
-                terminal.scrollTop = terminal.scrollHeight;
-                etapa++;
-            }, 1500);
+                const pontoAtual = pontosRotaCustomizada[indicePonto];
+                const proximoPonto = pontosRotaCustomizada[indicePonto + 1];
+                let passos = 0;
+                const totalPassos = 10;
+
+                const intervaloPasso = setInterval(() => {
+                    passos++;
+                    bateria -= 0.5;
+
+                    const pct = passos / totalPassos;
+                    const latInterp = pontoAtual[0] + (proximoPonto[0] - pontoAtual[0]) * pct;
+                    const lngInterp = pontoAtual[1] + (proximoPonto[1] - pontoAtual[1]) * pct;
+
+                    droneMarker.setLatLng([latInterp, lngInterp]);
+                    map.panTo([latInterp, lngInterp]);
+
+                    if (passos >= totalPassos) {
+                        clearInterval(intervaloPasso);
+                        indicePonto++;
+                        terminal.innerHTML += `<div class="log-entry">Checkpoint #${indicePonto} processado. Bateria: ${Math.floor(bateria)}%</div>`;
+                        terminal.scrollTop = terminal.scrollHeight;
+                        moverParaProximoCheckpoint();
+                    }
+                }, 150);
+            }
+
+            function executarRetornoBase() {
+                const posicaoFinalInvasao = droneMarker.getLatLng();
+                const base = coordenadasSetores.hangarBase;
+                let p = 0;
+
+                const loopRetorno = setInterval(() => {
+                    p += 0.1;
+                    const lat = posicaoFinalInvasao.lat + (base[0] - posicaoFinalInvasao.lat) * p;
+                    const lng = posicaoFinalInvasao.lng + (base[1] - posicaoFinalInvasao.lng) * p;
+
+                    droneMarker.setLatLng([lat, lng]);
+                    map.panTo([lat, lng]);
+
+                    if (p >= 1) {
+                        clearInterval(loopRetorno);
+                        map.removeLayer(droneMarker);
+                        if (rotaVetor) map.removeLayer(rotaVetor);
+                        terminal.innerHTML += `<div class="log-entry log-success">🛬 Unidade acoplada com sucesso. Hangar Mackenzie trancado.</div>`;
+                        terminal.scrollTop = terminal.scrollHeight;
+                    }
+                }, 200);
+            }
+
+            moverParaProximoCheckpoint();
         }
     </script>
 </body>

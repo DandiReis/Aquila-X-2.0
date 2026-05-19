@@ -4,25 +4,30 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
-@Document(collection = "logs_operacionais")
+@Document(collection = "logs_missao")
 public class LogMissao {
+
     @Id
     private String id;
-    private String tipoEvento; 
-    private int idOperador;
-    private int idDrone;
-    private String objetivo;
-    private String statusSistema;
-    private LocalDateTime timestamp = LocalDateTime.now();
+    private Long idMissao;
+    private String mensagem;
+    private LocalDateTime timestamp;
 
-    // Construtor completo para o log militar
-    public LogMissao(String tipoEvento, int idOperador, int idDrone, String objetivo, String statusSistema) {
-        this.tipoEvento = tipoEvento;
-        this.idOperador = idOperador;
-        this.idDrone = idDrone;
-        this.objetivo = objetivo;
-        this.statusSistema = statusSistema;
+    public LogMissao() {}
+
+    public LogMissao(Long idMissao, String mensagem) {
+        this.idMissao = idMissao;
+        this.mensagem = mensagem;
+        this.timestamp = LocalDateTime.now();
     }
 
-    // Getters...
+    // Getters e Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public Long getIdMissao() { return idMissao; }
+    public void setIdMissao(Long idMissao) { this.idMissao = idMissao; }
+    public String getMensagem() { return mensagem; }
+    public void setMensagem(String mensagem) { this.mensagem = mensagem; }
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }

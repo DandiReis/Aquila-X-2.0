@@ -40,7 +40,7 @@ public class MissaoController {
 
     @GetMapping("/frota-disponivel")
     public List<Drone> listarFrotaPronta() {
-        // Retorna apenas drones com status 1 (Prontos para combate)
         return droneRepository.findByStatus(1);
     }
+
 }
