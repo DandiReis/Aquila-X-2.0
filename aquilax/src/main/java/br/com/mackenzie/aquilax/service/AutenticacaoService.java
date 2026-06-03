@@ -10,9 +10,9 @@ public class AutenticacaoService {
 
     @Autowired
     private OperadorRepository operadorRepository;
-
+    
     public Operador validarAcesso(String registro, String senha) {
-        // Lógica: Credenciais válidas? 
+        // Vai ao MySQL buscar o operador pelo registro e checa a senha
         return operadorRepository.findByRegistroOperador(registro)
                 .filter(op -> op.getSenha().equals(senha))
                 .orElseThrow(() -> new RuntimeException("Credenciais inválidas! Alerta de Erro emitido.")); 

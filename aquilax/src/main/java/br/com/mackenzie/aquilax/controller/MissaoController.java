@@ -6,11 +6,13 @@ import br.com.mackenzie.aquilax.repository.DroneRepository;
 import br.com.mackenzie.aquilax.repository.MissaoRepository;
 import br.com.mackenzie.aquilax.service.MissaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/missoes")
+@CrossOrigin(origins = "*") // <-- ADICIONE ESTA LINHA EXATAMENTE AQUI!
 public class MissaoController {
 
     @Autowired
@@ -18,6 +20,9 @@ public class MissaoController {
 
     @Autowired
     private MissaoService missaoService;
+
+    @Autowired
+    private DroneRepository droneRepository; // Organizado junto com os outros @Autowired
 
     @PostMapping("/iniciar")
     public String criarMissao(@RequestBody Missao request) {
@@ -35,12 +40,15 @@ public class MissaoController {
         return missaoRepository.findAll();
     }
 
-    @Autowired
-    private DroneRepository droneRepository;
-
     @GetMapping("/frota-disponivel")
     public List<Drone> listarFrotaPronta() {
         return droneRepository.findByStatus(1);
     }
 
+    @PostMapping("/evasao")
+    public ResponseEntity<String> dispararEvasao() {
+        missaoService.acionarEvasaoTatica();
+        System.out.println("🚨 [API] Endpoint de evasão acionado pelo operador!");
+        return ResponseEntity.ok("Protocolo de evasão iniciado com sucesso.");
+    }
 }
