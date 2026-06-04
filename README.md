@@ -31,3 +31,5 @@ ETAPA #8: Projeto Final (código Java, documentação e vídeo demo) - 27/05.<br
 
 <img width="835" height="496" alt="Captura de tela 2026-04-01 074313" src="https://github.com/user-attachments/assets/7974a417-3789-45ee-96e6-1beec7f57481" />
 
+**Link Video: https://youtu.be/kL4qLS_5fTU**
+
