@@ -1,35 +1,46 @@
-# Aquila-X
-A Securus Dynamics é uma empresa multinacional especializada no desenvolvimento de drones bélicos autônomos para operações militares. O seu principal produto, o Aquila-X, é uma frota de drones equipados com inteligência artificial e sensores avançados, capazes de realizar missões táticas, reconhecimento em território hostil e ataques de precisão. 
+# 🦅 Aquila-X: Sistema de Gestão Operacional de Drones
 
-<h3>SPRINTS-1</h3>
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 
-ETAPA #1: Proposta de Projeto (tema, equipes e repositório GitLab?) - 04/03.<br>
-ETAPA #2: Diagrama de Classes inicial - 11/03.<br>
-ETAPA #3: Diagrama de Sequência inicial - 18/03.<br>
-ETAPA #4: Integração de modelos (Classes + Banco de Dados) - 25/03.<br>
+## 📌 Sobre o Projeto
 
-<h3>SPRINTS-2</h3>
+O **Aquila-X** é um sistema de gestão operacional e telemetria desenvolvido para a frota de drones autônomos da Securus Dynamics (empresa fictícia do cenário do projeto). O foco da aplicação é garantir o controle seguro, o monitoramento em tempo real e a execução de missões táticas de veículos não tripulados.
 
-ETAPA #5: Diagrama de Projeto (com abstrações e interfaces) - 29/04.<br>
-ETAPA #6: Integração Sequência + Colaboração - 06/05.<br>
-ETAPA #7: Diagrama de Estados - 13/05.<br>
-ETAPA #8: Projeto Final (código Java, documentação e vídeo demo) - 27/05.<br>
+Este projeto destaca-se pela sua **arquitetura híbrida de bases de dados**, separando o domínio transacional (MySQL) do grande volume de dados de logs e telemetria (MongoDB), demonstrando a aplicação de padrões reais de engenharia de software e sistemas distribuídos.
 
-**Relatorio: https://docs.google.com/document/d/1ItVzpphOwSAnTBSKtbsfxZL6fCjklnaYristfV2Ug1Q/edit?usp=sharing**
+## 🚀 Principais Funcionalidades
 
-**Diagrama de classe: https://drive.google.com/file/d/1P0eSxD0HKjwtVM7ePSSC8p4vEr-h8RGD/view?usp=sharing**
+*   **Autenticação e Segurança:** Controlo de acesso e validação de operadores do sistema.
+*   **Gestão de Frota e Missões:** Acompanhamento do status de cada drone (disponível, em manutenção, em missão) e criação de novas operações táticas.
+*   **Motor de Regras de Negócio:** Validação rigorosa para a alocação de veículos e verificação de requisitos antes do voo.
+*   **Simulação Operacional:** Análise de eventos críticos durante a missão, incluindo simulação de falhas de sistema (pane) e acionamento de protocolos de evasão tática.
+*   **Telemetria e Auditoria:** Registo contínuo de dados de voo e eventos operacionais para análise posterior.
+*   **Interface Gráfica (Web):** Dashboard para operação e visualização dos dados da frota.
 
-**Diagrama de Sequência: https://drive.google.com/file/d/1Zf640xscSO_4kzHAD1N6NGl29ZO5ZS2z/view?usp=sharing**
+## 🛠️ Tecnologias e Arquitetura
 
-**Diagrama de Colabolação: https://drive.google.com/file/d/1iRtH9nuOGP7e2qgBivXVu1bvDv34eiJ-/view?usp=sharing**
+O ecossistema do Aquila-X foi construído sobre uma arquitetura RESTful, utilizando as seguintes tecnologias:
 
-**Diagrama de Estado: https://drive.google.com/file/d/1XWi6sReJKVm899vOp_kPyFxk8_xAL8vR/view?usp=sharing**
+*   **Back-end:** Java com Spring Boot.
+*   **APIs:** Desenvolvimento de Controllers RESTful para exposição de endpoints de navegação e operação.
+*   **Persistência Relacional (MySQL):** Utilização de JPA/Hibernate para a gestão de dados estruturados e transacionais (operadores, cadastro de drones, missões).
+*   **Persistência NoSQL (MongoDB):** Armazenamento de alta performance para a volumetria de logs de telemetria e auditoria de eventos.
+*   **Front-end:** HTML, CSS e JavaScript puros para a interface web de operação.
+*   **Gestão de Dependências:** Maven.
 
-**Diagrama_noSQL: https://drive.google.com/file/d/1tPtg6U3-lCKZz4JpFfGQdZAp_2JE1Sn6/view?usp=sharing**
+## ⚙️ Como Executar o Projeto
 
-**R_Diagramas: https://docs.google.com/document/d/1-gvBQv8zfpQ-5GoAFR6mZ3Dpw_Ei6km6GNagTAUHyvc/edit?usp=sharing**
+### Pré-requisitos
+*   Java Development Kit (JDK) 17+
+*   Maven
+*   MySQL Server a correr localmente ou via Docker
+*   MongoDB a correr localmente ou via Docker
 
-<img width="835" height="496" alt="Captura de tela 2026-04-01 074313" src="https://github.com/user-attachments/assets/7974a417-3789-45ee-96e6-1beec7f57481" />
+### Passos para Instalação
 
-**Link Video: https://youtu.be/kL4qLS_5fTU**
-
+1. Clone este repositório:
+   ```bash
+   git clone [https://github.com/DandiReis/Aquila-X-2.0.git](https://github.com/DandiReis/Aquila-X-2.0.git)
