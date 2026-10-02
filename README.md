@@ -33,14 +33,16 @@ O ecossistema do Aquila-X foi construído sobre uma arquitetura RESTful, utiliza
 
 ## ⚙️ Como Executar o Projeto
 
+Como a aplicação utiliza uma arquitetura híbrida, é necessário ter instâncias locais do MySQL e MongoDB rodando na sua máquina.
+
 ### Pré-requisitos
 *   Java Development Kit (JDK) 17+
 *   Maven
-*   MySQL Server a correr localmente ou via Docker
-*   MongoDB a correr localmente ou via Docker
+*   MySQL Server (local ou via Docker)
+*   MongoDB (local ou via Docker)
 
 ### Passos para Instalação
 
-1. Clone este repositório:
+1. **Clone este repositório:**
    ```bash
    git clone [https://github.com/DandiReis/Aquila-X-2.0.git](https://github.com/DandiReis/Aquila-X-2.0.git)
