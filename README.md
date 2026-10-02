@@ -46,3 +46,28 @@ Como a aplicação utiliza uma arquitetura híbrida, é necessário ter instânc
 1. **Clone este repositório:**
    ```bash
    git clone [https://github.com/DandiReis/Aquila-X-2.0.git](https://github.com/DandiReis/Aquila-X-2.0.git)
+2. Configuração dos Bancos de Dados:
+
+    Crie um schema no seu MySQL chamado aquila_db (ou o nome que preferir).
+
+    O MongoDB criará o banco automaticamente na primeira inserção.
+
+3. Ajuste de Credenciais:
+
+    Navegue até src/main/resources/application.properties (ou .yml).
+
+    Altere as variáveis de conexão com o seu usuário e senha locais:
+
+    spring.datasource.url=jdbc:mysql://localhost:3306/aquila_db
+    spring.datasource.username=SEU_USUARIO_AQUI
+    spring.datasource.password=SUA_SENHA_AQUI
+    spring.data.mongodb.uri=mongodb://localhost:27017/aquila_logs
+
+4. Execução:
+    Na raiz do projeto, execute:
+    ```Bash
+    mvn clean install
+    mvn spring-boot:run
+
+5. Acesso:
+    A interface web estará disponível em: http://localhost:8080.
